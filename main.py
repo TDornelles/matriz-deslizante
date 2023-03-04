@@ -1,35 +1,27 @@
-import numpy as np
-
-
 class Node:
-    def __init__(self, value):
-        self.value = value
+    def __init__(self, moves):
         self.children = []
-        self.moves = []
+        self.moves = moves
+
+# inserção de dados
+print("Insira a matriz inicial e desejada:")
+matrix = []
+counter = 0
+while counter < 6:
+    try:
+        line = input()
+        contents = [line[0], line[2], line[4]]
+        matrix.append(contents)
+        counter = counter + 1
+    except EOFError:
+        break
+
+matrizInicial = [matrix[0], matrix[1], matrix[2]]
+matrizFinal = [matrix[3], matrix[4], matrix[5]]
 
 
-
-
-# print("Insira a matriz inicial e desejada:")
-# matrix = []
-# counter = 0
-# while counter < 6:
-#     try:
-#         line = input()
-#         contents = [line[0], line[2], line[4]]
-#         matrix.append(contents)
-#         counter = counter + 1
-#     except EOFError:
-#         break
-
-# matrizInicial = [matrix[0], matrix[1], matrix[2]]
-# matrizFinal = [matrix[3], matrix[4], matrix[5]]
-
-
-
-matrizInicial = [["a", "b", "e"], ["r", "g", "e"], ["e", "c", "c"]]
-matrizFinal = [["a", "b", "e"], ["e", "r", "g"], ["c", "c", "e"]]
-
+# matrizInicial = [["a", "b", "e"], ["r", "g", "e"], ["e", "c", "c"]]
+# matrizFinal = [["a", "b", "e"], ["e", "r", "g"], ["c", "c", "e"]]
 
 
 def slide(line, matriz):
@@ -54,59 +46,42 @@ def change_state(rotations, matriz):
 def busca():
     solved = False
     moves = []
-    pilha = [Node(0)]
+    pilha = [Node([])]
     testado = []
     i = 0
     
     while len(pilha) > 0:
         no:Node = pilha.pop(0)
-        if (testado.count(no.moves) == 0 or no.value < 13):
+        repetido = False
+        for j in testado:
+            if j.count(1) == no.moves.count(1) and j.count(2) == no.moves.count(2) and j.count(3) == no.moves.count(3):
+                repetido = True
+        if (testado.count(no.moves) == 0 and repetido == False):
             i+=1
             testado.append(no.moves)
             # testar movimento
             mAux = matrizInicial.copy()
-            if no.value != 0: change_state(no.moves, mAux)
+            change_state(no.moves, mAux)
             if mAux == matrizFinal:
                 solved = True
                 moves = no.moves
                 break
+            # criar filhos
             for n in range(3):
                 childMoves = no.moves.copy()
                 childMoves.append(n+1)
-                newNode = Node(n+1+no.value)
-                newNode.moves = childMoves
-                pilha.append(newNode)
+                # adicionar na pilha apenas se o mvoes nao tiver mais de 2 vezes o mesmo movimento
+                if childMoves.count(n+1)<3:
+                    newNode = Node(childMoves)
+                    newNode.moves = childMoves
+                    pilha.append(newNode)
 
     if solved:
-        print(moves)
+        print("R1: "+str(moves.count(1))+", R2: "+str(moves.count(2))+", R3: "+str(moves.count(3)))
     else:
         print("impossible")
 
-
-
-
-# def busca():
-#     tries = 0
-#     solved = False
-#     moves = []
-#     for i in mD:
-#         tries = tries + 1
-#         mAux = matrizInicial.copy()
-#         change_state(mD[i], mAux)
-#         if mAux == matrizFinal:
-#             moves = mD[i]
-#             solved = True
-#             break
-
-#     if solved == False:
-#         print("impossivel")
-#     else:
-#         for i in moves:
-#             print("R"+ str(moves[i-1]), end=" ")
-        
-#         print()
-        
-#     print(tries)
+    print(i)
     
 
 busca()
